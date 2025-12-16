@@ -17,14 +17,13 @@ export const options = {
   },
 };
 
-const GRAPHQL_URL = "https://qa.ui.marketing/api";
+const GRAPHQL_URL = "https://qa.ui.marketing/api/graphql";
 
 
 // The Users query – operation name is Users, field is users
 const USERS_QUERY = `
   query Users(
   $filter: UsersFilter
-  $includeAdminFields: Boolean = false
   $limit: Int
   $offset: Int
   $scope: UserScope
@@ -41,7 +40,6 @@ const USERS_QUERY = `
     sort: $sort
     types: $types
   ) {
-    ...User
     __typename
   }
 }
@@ -51,7 +49,15 @@ const USERS_QUERY = `
 export default function () {
   const payload = JSON.stringify({
     query: USERS_QUERY,
-    variables: {}, // none needed for "all users"
+    variables: {
+      filter: null,
+      limit: 50,
+      offset: 0,
+      scope: null,
+      searchTerm: null,
+      sort: null,
+      types: null,
+    },
   });
 
   const headers = {
@@ -64,6 +70,11 @@ export default function () {
     headers,
     tags: { endpoint: "Users" },
   });
+
+  if (res.status !== 200) {
+    console.log("Non-200 status:", res.status);
+    console.log("Body snippet:", res.body.substring(0, 200));
+  }
 
   const json = res.json();
 
