@@ -26,14 +26,23 @@ const USERS_QUERY = `
     }
 `;
 
-export function runUsersQuery() {
+export function runUsersQuery(auth) {
+    if (!auth?.access_token || !auth?.refresh_token) {
+        throw new Error("[Users] missing auth tokens (did login fail?)");
+    }
+
     const { json } = graphqlRequest({
         operationName: "Users",
         query: USERS_QUERY,
         variables: USERS_VARS,
+        auth
     });
 
     if (!json) return;
+
+    if (json?.data?.users) {
+        console.log(`[Users] ok count=${json.data.users.length}`);
+    }
 
     check(json, {
         "[Users] no GraphQL errors": (j) => !j.errors,
