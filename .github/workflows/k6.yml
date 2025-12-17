@@ -6,7 +6,6 @@ on:
 jobs:
   k6_cloud_test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -19,8 +18,11 @@ jobs:
 
       - name: Run k6 and send results to Grafana Cloud
         env:
+          # 1Password (used by `op run ...`)
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
-          K6_CLOUD_PROJECT_ID: ${{ secrets.K6_CLOUD_PROJECT_ID }}
+
+          # k6 Cloud (what `--out cloud` needs)
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_API_TOKEN }}
+          K6_CLOUD_PROJECT_ID: ${{ secrets.K6_PROJECT_ID }}
         run: |
           op run --env-file=".env.qa" -- k6 run --out cloud tests/loadtest.js
