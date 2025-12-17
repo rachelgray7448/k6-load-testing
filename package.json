@@ -1,0 +1,5 @@
+{
+    "scripts": {
+        "k6:qa": "op run --env-file='.env.qa' -- k6 run tests/loadtest.js"
+    }
+}
